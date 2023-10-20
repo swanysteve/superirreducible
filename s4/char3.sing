@@ -1,0 +1,91 @@
+
+ring r = 3,(x),dp;
+
+proc is_irreducible( poly f )
+{
+  def rr=factorize(f,2);
+  if (size(rr[2])>1)
+  {
+    return(0);
+  }
+  else
+  {
+    return(rr[2][1]<2);
+  }
+};
+
+list deg1 = x, x+1, x+2, 2x, 2x+1, 2x+2;
+
+proc bump( int n, list L )
+{
+  list l;
+
+  for ( int i = 1; i <= size(L); i = i+1 )
+  {
+    l = l + list( (x)^n+L[i], 2*(x)^n+L[i] );
+    if ( 1 == leadcoef(L[i]) )
+    {
+      l = l + list( (x)^n-x^(n-1)+L[i], 2*(x)^n-x^(n-1)+L[i] );
+    }
+  }
+  return(l);
+}
+
+list deg2 = bump(2, deg1);
+list deg3 = bump(3, deg2);
+list deg4 = bump(4, deg3);
+list deg5 = bump(5, deg4);
+list deg6 = bump(6, deg5);
+list deg7 = bump(7, deg6);
+list deg8 = bump(8, deg7);
+list deg9 = bump(9, deg8);
+deg9;
+
+proc search_cands( int d, list cands, int k, list refs )
+{
+  printf("Checking degree %s list", d);
+  printf("  against %s degree %s [%s]", size(refs), k, list(refs));
+
+  for (int l = 1; l <= size(cands); l = l+1)
+  {
+
+    printf("Checking %s", cands[l]);
+
+    if ( 1 != leadcoef(cands[l]))
+    {
+      printf("  not monic");
+    }
+    else
+    {
+    if ( 0 == is_irreducible(cands[l]))
+    {
+      printf("  reducible");
+    }
+    else
+    {
+      int s = 0;
+      for (int i = 1; i <= size(refs); i = i+1)
+      {
+        s = s + is_irreducible( subst(cands[l],x,refs[i]) );
+      }
+      if (s == size(refs))
+      {
+        printf("  Yes");
+      }
+      else
+      {
+        printf("  No, only %s irred.", s);
+      }
+    }
+    }
+  }
+}
+
+//search_cands( 2, deg2, 4, deg4 );    // s4(3,2)
+//search_cands( 3, deg3, 4, deg4 );    // s4(3,3)
+//search_cands( 4, deg4, 4, deg4 );    // s4(3,4)
+search_cands( 5, deg5, 4, deg4 );    // s4(3,5)
+//search_cands( 6, deg6, 4, deg4 );    // s4(3,6)
+
+quit;
+
