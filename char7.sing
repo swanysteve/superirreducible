@@ -1,0 +1,102 @@
+
+ring r = 7,(x),dp;
+
+proc is_irreducible( poly f )
+{
+  def rr=factorize(f,2);
+  if (size(rr[2])>1)
+  {
+    return(0);
+  }
+  else
+  {
+    return(rr[2][1]<2);
+  }
+};
+
+list deg1 = x, x+1, x+2, x+3, x+4, x+5, x+6,
+  2x, 2x+1, 2x+2, 2x+3, 2x+4, 2x+5, 2x+6,
+  3x, 3x+1, 3x+2, 3x+3, 3x+4, 3x+5, 3x+6,
+  4x, 4x+1, 4x+2, 4x+3, 4x+4, 4x+5, 4x+6,
+  5x, 5x+1, 5x+2, 5x+3, 5x+4, 5x+5, 5x+6,
+  6x, 6x+1, 6x+2, 6x+3, 6x+4, 6x+5, 6x+6;
+
+proc bump( int n, list L )
+{
+  list l;
+
+  for ( int i = 1; i <= size(L); i = i+1 )
+  {
+    l = l + list( (x)^n+L[i], 2*(x)^n+L[i], 3*(x)^n+L[i], 4*(x)^n+L[i], 5*(x)^n+L[i], 6*(x)^n+L[i] );
+    if ( 1 == leadcoef(L[i]) )
+    {
+      l = l + list( (x)^n-x^(n-1)+L[i], 2*(x)^n-x^(n-1)+L[i], 3*(x)^n-x^(n-1)+L[i],
+                  4*(x)^n-x^(n-1)+L[i], 5*(x)^n-x^(n-1)+L[i], 6*(x)^n-x^(n-1)+L[i] );
+    }
+  }
+  return(l);
+}
+
+list deg2 = bump(2, deg1);
+list deg3 = bump(3, deg2);
+list deg4 = bump(4, deg3);
+list deg5 = bump(5, deg4);
+list deg6 = bump(6, deg5);
+
+proc search_cands( int d, list cands, int k, list refs )
+{
+  printf("Checking degree %s list", d);
+  printf("  against %s degree %s [%s]", size(refs), k, list(refs));
+
+  for (int l = 1; l <= size(cands); l = l+1)
+  {
+
+    printf("Checking %s", cands[l]);
+
+    if ( 1 != leadcoef(cands[l]))
+    {
+      printf("  not monic");
+    }
+    else
+    {
+    if ( 0 == is_irreducible(cands[l]))
+    {
+      printf("  reducible");
+    }
+    else
+    {
+      int s = 0;
+      for (int i = 1; i <= size(refs); i = i+1)
+      {
+        s = s + is_irreducible( subst(cands[l],x,refs[i]) );
+      }
+      if (s == size(refs))
+      {
+        printf("  Yes");
+      }
+      else
+      {
+        printf("  No, only %s irred.", s);
+      }
+    }
+    }
+  }
+}
+
+//search_cands( 2, deg2, 2, deg2 );  // s2(7,2) // degree too small
+//search_cands( 3, deg3, 2, deg2 );  // s2(7,3) // degree odd
+//search_cands( 2, deg2, 3, deg3 );    // s3(7,2)
+search_cands( 3, deg3, 3, deg3 );    // s3(7,3)
+//search_cands( 4, deg4, 2, deg2 );    // s2(7,4)
+//search_cands( 4, deg4, 3, deg3 );    // s3(7,4)
+//search_cands( 5, deg5, 2, deg2 );    // s2(7,5) // degree odd
+//search_cands( 5, deg5, 3, deg3 );    // s3(7,5)
+//search_cands( 6, deg6, 2, deg2 );    // s2(7,6)
+//search_cands( 6, deg6, 3, deg3 );    // s3(7,6)
+//search_cands( 7, deg7, 2, deg2 );    // s2(7,7) // degree odd
+//search_cands( 7, deg7, 3, deg3 );    // s3(7,7)
+//search_cands( 8, deg8, 2, deg2 );    // s2(7,8)
+//search_cands( 8, deg8, 3, deg3 );    // s3(7,8)
+
+quit;
+

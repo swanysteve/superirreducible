@@ -1,0 +1,93 @@
+
+ring r = 2,(x),dp;
+
+proc is_irreducible( poly f )
+{
+  def rr=factorize(f,2);
+  if (size(rr[2])>1)
+  {
+    return(0);
+  }
+  else
+  {
+    return(rr[2][1]<2);
+  }
+};
+
+list deg1 = x, x+1;
+
+proc bump( int n, list L )
+{
+  list l;
+
+  for ( int i = 1; i <= size(L); i = i+1 )
+  {
+    l = l + list( (x)^n-(x)^(n-1)+L[i], (x)^n+L[i] );
+  }
+  return(l);
+}
+
+list deg2 = bump(2, deg1);
+list deg3 = bump(3, deg2);
+list deg4 = bump(4, deg3);
+list deg5 = bump(5, deg4);
+list deg6 = bump(6, deg5);
+list deg7 = bump(7, deg6);
+list deg8 = bump(8, deg7);
+list deg9 = bump(9, deg8);
+list deg10 = bump(10, deg9);
+list deg11 = bump(11, deg10);
+list deg12 = bump(12, deg11);
+list deg13 = bump(13, deg12);
+list deg14 = bump(14, deg13);
+
+
+proc search_cands( int d, list cands, int k, list refs )
+{
+  printf("Checking degree %s list", d);
+  printf("  against %s degree %s [%s]", size(refs), k, list(refs));
+
+  for (int l = 1; l <= size(cands); l = l+1)
+  {
+
+    printf("Checking %s", cands[l]);
+
+    if ( 0 == is_irreducible(cands[l]))
+    {
+      printf("  reducible");
+    }
+    else
+    {
+      int s = 0;
+      for (int i = 1; i <= size(refs); i = i+1)
+      {
+        s = s + is_irreducible( subst(cands[l],x,refs[i]) );
+      }
+      if (s == size(refs))
+      {
+        printf("  Yes");
+      }
+      else
+      {
+        printf("  No, only %s irred.", s);
+      }
+    }
+  }
+}
+
+//search_cands( 2, deg2, 3, deg3 );
+//search_cands( 3, deg3, 3, deg3 );
+//search_cands( 4, deg4, 3, deg3 );
+//search_cands( 5, deg5, 3, deg3 );
+//search_cands( 6, deg6, 3, deg3 );
+//search_cands( 7, deg7, 3, deg3 );
+//search_cands( 8, deg8, 3, deg3 );
+//search_cands( 9, deg9, 3, deg3 );
+//search_cands( 10, deg10, 3, deg3 );
+//search_cands( 11, deg11, 3, deg3 );
+//search_cands( 12, deg12, 3, deg3 );
+//search_cands( 13, deg13, 3, deg3 );
+search_cands( 14, deg14, 3, deg3 );
+
+quit;
+
